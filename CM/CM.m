@@ -77,40 +77,40 @@ I_noisy = I_ideal .* (1 + noise_factor * (rand(size(V)) - 0.5));
 % I_fit_b = feval(fitResult, V);
 
 % % Nonlinear curve fitting using fit function Part C
-% fitType = fittype('A.*(exp(1.2*x/25e-3) - 1) + C.*x - B.*(exp(1.2*(x+D)/25e-3) - 1)', ...
-%     'independent', 'x', ...
-%     'dependent', 'y', ...
-%     'coefficients', {'A', 'B', 'C', 'D'});
-% 
-% % Start points for A, B, C, and D
-% startPoints = [Is, Ib, Gp, Vb];
-% 
-% % Perform the fitting
-% [fitResult, gof] = fit(V', I_noisy', fitType, 'StartPoint', startPoints);
-% 
-% % Generate the fitted curve
-% I_fit_all = feval(fitResult, V);
+fitType = fittype('A.*(exp(1.2*x/25e-3) - 1) + C.*x - B.*(exp(1.2*(x+D)/25e-3) - 1)', ...
+    'independent', 'x', ...
+    'dependent', 'y', ...
+    'coefficients', {'A', 'B', 'C', 'D'});
 
-inputs = V.';
-targets = I_noisy.';
-hiddenLayerSize = 10;
-net = fitnet(hiddenLayerSize);
-net.divideParam.trainRatio = 70/100;
-net.divideParam.valRatio = 15/100;
-net.divideParam.testRatio = 15/100;
-[net,tr] = train(net,inputs,targets);
-outputs = net(inputs);
-errors = gsubtract(outputs,targets);
-performance = perform(net,targets,outputs);
-view(net);
-Inn = outputs;
+% Start points for A, B, C, and D
+startPoints = [Is, Ib, Gp, Vb];
+
+% Perform the fitting
+[fitResult, gof] = fit(V', I_noisy', fitType, 'StartPoint', startPoints);
+
+% Generate the fitted curve
+I_fit = feval(fitResult, V);
+
+% inputs = V.';
+% targets = I_noisy.';
+% hiddenLayerSize = 10;
+% net = fitnet(hiddenLayerSize);
+% net.divideParam.trainRatio = 70/100;
+% net.divideParam.valRatio = 15/100;
+% net.divideParam.testRatio = 15/100;
+% [net,tr] = train(net,inputs,targets);
+% outputs = net(inputs);
+% errors = gsubtract(outputs,targets);
+% performance = perform(net,targets,outputs);
+% view(net);
+% Inn = outputs;
 
 % Plotting the I-V characteristic with noisy data and fitted curve
 figure;
 
 % Plot with noisy data and fitted curve using fit function
 subplot(1, 2, 1);
-plot(V, I_noisy, 'r.', V, Inn, 'b-');
+plot(V, I_noisy, 'r.', V, I_fit, 'b-');
 title('Diode I-V Characteristics with Fit (Linear Scale)');
 xlabel('Voltage (V)');
 ylabel('Current (A)');
@@ -120,7 +120,7 @@ grid on;
 
 % Fit on semi-log scale
 subplot(1, 2, 2);
-semilogy(V, abs(I_noisy), 'r.', V, abs(Inn), 'b-');
+semilogy(V, abs(I_noisy), 'r.', V, abs(I_fit), 'b-');
 title('Diode I-V Characteristics with Fit (Semi-log Scale)');
 xlabel('Voltage (V)');
 ylabel('Current (A)');
